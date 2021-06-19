@@ -6,37 +6,41 @@ import time
 class JobPool():
     def __init__(self, number_of_workers):
         
-        self.q = queue.Queue()
+        self.q = queue.Queue(number_of_workers)
         self.active = True
         for i in range(number_of_workers):
             threading.Thread(target=self.worker, daemon=True, args=(i,) ).start()
 
-    def addJob(self, num):
+    def addJob(self, a,b ):
         if self.active:
-            message = f'\n--I am Process {num}--'
-            self.q.put( message )
+            self.q.put( a  )
 
     def stop(self):
-        self.active=False
-        return self.q.join()
+        if self.active:
+            return self.q.join()
+    
 
-    def worker(self, number):
+    def worker(self, number ):
         while self.active:
-            print(f'Thread {number} started...')
+            print(f'Thread {number} .')
 
             item = self.q.get()
             print(f'Working on {item}')
             time.sleep(5)
-            print(f'Finished {item}')
+            print(f'{number} Finished {item}')
             self.q.task_done()
 
 
 
-pool = JobPool(10)
+pool = JobPool(4)
 print('Created pool')
-pool.addJob(1)
-pool.addJob(2)
-pool.addJob(3)
+pool.addJob('a.txt','1.txt')
+pool.addJob('b.txt','2.txt')
+pool.addJob('c.txt','3.txt')
+pool.addJob('d.txt','4.txt')
+
+pool.addJob('e.txt','5.txt')
+
 
 print('All task requests sent')
 
